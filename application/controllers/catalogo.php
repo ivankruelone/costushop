@@ -445,6 +445,7 @@ class Catalogo extends CI_Controller
         $data['ttra'] = $row->teltra;
         $data['tcel'] = $row->telcel;
         $data['tipo'] = $row->tipo;
+        $data['observacion'] = $row->obser_cli;
 
         $data['titulo'] = "CAMBIAR DATOS DE CLIENTE";
         $data['contenido'] = "catalogo/clientes_c_form_cambia";
@@ -470,10 +471,11 @@ class Catalogo extends CI_Controller
         $num = $this->input->post('num');
         $int = $this->input->post('int');
         $tipo = $this->input->post('tipo');
+        $observacion = $this->input->post('observacion');
 
         $this->load->model('catalogo_model');
         $this->catalogo_model->update_member_cliente($id, $nom, $dir, $col, $pob, $cp, $correo,
-            $rfc, $tcas, $ttra, $tcel, $num, $int, $tipo);
+            $rfc, $tcas, $ttra, $tcel, $num, $int, $tipo, $observacion);
         redirect('catalogo');
     }
 
@@ -808,6 +810,7 @@ class Catalogo extends CI_Controller
         $this->db->update('usuarios', $data);
         echo $this->db->affected_rows();
     }
+    
 
 }
 

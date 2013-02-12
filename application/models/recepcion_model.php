@@ -1127,11 +1127,12 @@ left join prendas p2 on a.prenda_nueva = p2.id
     function create_member_orden_c()
     {
         $this->db->select('id');
-        $this->db->where('id_cliente', 0);
-        $this->db->where('importe', 0);
+        $this->db->where('id_status', 1);
         $this->db->order_by('id');
         $this->db->limit(1);
         $q = $this->db->get('orden_c');
+        
+//        echo $this->db->last_query();
 
         if ($q->num_rows() > 0) {
 

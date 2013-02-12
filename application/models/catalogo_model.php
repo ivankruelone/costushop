@@ -12,6 +12,23 @@ class Catalogo_model extends CI_Model
 
     }
 
+    public function observacion_cliente($id)
+    {
+        $this->db->select('obser_cli');
+        $this->db->where('id', $id);
+        $query = $this->db->get('clientes');
+        
+        if($query->num_rows() > 0){
+            
+            $row = $query->row();
+            return $row->obser_cli;
+
+        }else{
+            return null;
+        }
+        
+    }
+
     function clientes($campo, $orden, $limit, $offset = 0)
     {
         $this->db->order_by($campo, $orden);
@@ -230,7 +247,7 @@ class Catalogo_model extends CI_Model
     }
 
     function update_member_cliente($id, $nom, $dir, $col, $pob, $cp, $correo, $rfc,
-        $tcas, $ttra, $tcel, $num, $int, $tipo)
+        $tcas, $ttra, $tcel, $num, $int, $tipo, $observacion)
     {
 
         $data = array(
@@ -247,7 +264,8 @@ class Catalogo_model extends CI_Model
             'telcasa' => $tcas,
             'teltra' => $ttra,
             'telcel' => $tcel,
-            'tipo' => $tipo);
+            'tipo' => $tipo,
+            'obser_cli' => $observacion);
 
         $this->db->where('id', $id);
         $this->db->update('clientes', $data);

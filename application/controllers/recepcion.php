@@ -638,6 +638,19 @@ class Recepcion extends CI_Controller
         $this->db->update('parametros');
         echo $this->db->affected_rows();
     }
+    
+    public function observacion_cliente($id)
+    {
+        $this->load->model('catalogo_model');
+        echo $this->catalogo_model->observacion_cliente($id);
+    }
+
+    public function observacion_cliente2($id)
+    {
+        $this->load->model('catalogo_model');
+        echo "<h2>Observaci&oacute;n sobre el cliente</h2>";
+        echo $this->catalogo_model->observacion_cliente($id);
+    }
 }
 
 /* End of file recepcion.php */

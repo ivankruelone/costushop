@@ -79,10 +79,17 @@
               'maxlength'   => '18',
               'size'        => '18'
             );
+            $data_observaciones = array(
+              'name'        => 'observacion',
+              'id'          => 'observacion',
+              'value'       => $observacion,
+              'maxlength'   => '255',
+              'size'        => '60'
+            );
   ?>
   
   <table>
-   <tr>
+   
  <tr>
 	<td>Nombre del cliente: </td>
 	<td><?php echo form_input($data_nom, "", 'required');?><span id="mensaje"></span></td>
@@ -116,10 +123,17 @@
 </tr>
 <tr>
 	<td>Tipo:</td>
-    <td> <?php echo form_dropdown('tipo',array('1'=>'Activo','0'=>'Inactivo'),$tipo)?></td>
+    <td colspan="3"> <?php echo form_dropdown('tipo',array('1'=>'Activo','0'=>'Inactivo'),$tipo)?></td>
 </tr>
 
-	<td colspan="6"><?php echo form_submit('envio', 'CAMBIAR CLIENTE');?></td>
+<tr>
+	<td>Observaci&oacute;n:</td>
+    <td colspan="3"> <?php echo form_input($data_observaciones);?></td>
+</tr>
+
+
+<tr>
+	<td colspan="4"><?php echo form_submit('envio', 'CAMBIAR CLIENTE');?></td>
  </tr>
 </table>
 <input type="hidden" value="<?php echo $id?>" name="id" id="id" />

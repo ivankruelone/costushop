@@ -9,7 +9,19 @@ class Login extends CI_Controller
     {
         parent::__construct();
         $this->load->helper(array('form', 'url'));
+        $this->modificar_tablas();
 
+    }
+    
+    function modificar_tablas()
+    {
+        $sql1 = "show fields from clientes where Field = 'obser_cli'";
+        $query1 = $this->db->query($sql1);
+        if($query1->num_rows() == 0){
+            $tabla_clientes = "ALTER TABLE `sastreria`.`clientes` ADD COLUMN `obser_cli` VARCHAR(255) DEFAULT NULL AFTER `tipo`;";
+            $this->db->query($tabla_clientes);
+        }
+        
     }
 
     function index($error = null)

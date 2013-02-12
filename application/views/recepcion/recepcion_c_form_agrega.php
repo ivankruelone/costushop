@@ -469,7 +469,6 @@
 
 </div>
 
-
   <script language="javascript" type="text/javascript">
     $(window).load(function () {
         $("#nom").focus();
@@ -483,6 +482,7 @@
         llena_servicio(prenda);
         detalle_sin_orden();
         $('#cliente_id').val(cli);
+        muestra_observacion_cliente(cli)
         
         $('#cerrar_orden').click(function(event){
             
@@ -561,7 +561,7 @@
     $('#clientes_c_form_agrega').submit(function(event) {
         
             event.preventDefault();
-            
+            var id = $('#id').attr('value');
         
                 var url = "<?php echo site_url();?>/catalogo/insert_cliente_recepcion";
                 var cliente = $('#nc_nom').attr('value');
@@ -601,6 +601,8 @@
                         $('#cliente').val(data);
                         $('#cliente_id').val(data);
                         $('#nom').val(cliente);
+                        cambia_cliente(id, data);
+                        muestra_observacion_cliente(data)
                         $.nmTop().close();
                         
                     }else{
@@ -659,6 +661,7 @@
                 $('#cliente').val(ui.item.id);
                 $('#cliente_id').val(ui.item.id);
                 cambia_cliente(id, ui.item.id);
+                muestra_observacion_cliente(ui.item.id);
             }
 		});
         
@@ -761,6 +764,25 @@
             });
         }
         //Termina Cambiar el id del cliente
+        
+        function muestra_observacion_cliente(id){
+            var url1 = "<?php echo site_url();?>/recepcion/observacion_cliente/" + id;
+            var url2 = "<?php echo site_url();?>/recepcion/observacion_cliente2/" + id;
+        
+            var variables = {
+
+            };
+            
+            $.post( url1, variables, function(data) {
+                
+                if(data.length > 0){
+                    $.nmManual(url2);
+                }
+                
+
+            });
+        }
+        
         
         //Cambia la fecha de entrega
         
