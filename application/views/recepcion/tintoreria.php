@@ -29,7 +29,6 @@
 <div style="width: 100%;" id="ticket">
 
 <div style="width: 100%; clear: both;">
-<div style="height: 325px; width: 100%;">.</div>
     <div align="center">
     <img src="<?php echo base_url();?>img/<?php echo LOGO_TICKET; ?>" border="0" width="350" align="middle" />
     </div>
@@ -50,17 +49,8 @@
         </td>
     </tr>
 	<tr>
-        <td>
-            Tel.:
-        </td>
-        <td>
-            <?php echo $row->telcasa; ?>
-        </td>
-        <td>
-            Celular:
-        </td>
-        <td>
-            <?php echo $row->telcel; ?>
+        <td colspan="4">
+            TINTORERIA
         </td>
 	</tr>
     <tr>
@@ -144,12 +134,6 @@
 </table>
     </div>
 	
-	<div align="center" style="font-size: 150px; clear: both;">
-                <?php echo $row->id; ?>
-    </div>
-	<div align="center" style="font-size: 35px; clear: both;">
-                <?php echo $dia[$row->dia]; ?>
-    </div>
 	<p>---</p>
 </div>
 </div>

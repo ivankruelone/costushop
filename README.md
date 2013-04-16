@@ -1,7 +1,7 @@
-COSTURITA Y COSTUSHOP
+COSTUSHOP
 =====================
 
-Sistema para manejo de sastrerias Costurita y Costushop.
+Sistema para manejo de sastrerias Costushop.
 
 Ayuda
 -----
@@ -18,7 +18,7 @@ contiene la tabla inicial necesaria para arrancar operaciones se debe restaurar 
 
 Buscar esta Ruta y Modificar los parametros de acuerdo a su configuracion actual.
     
-    costurita/application/config/database.php
+    costushop/application/config/database.php
 
 Lo que hay dentro:
 
@@ -45,11 +45,11 @@ Configuracion.
 
 Buscar esta Ruta y Modificar los parametros de acuerdo a su configuracion actual.
     
-    costurita/application/config/constants.php
+    costushop/application/config/constants.php
 
 Lo que hay dentro:
     
-    define('TITULO_WEB', 'COSTURITA - Arreglos para Verte Bien'); //Modificar el titulo
+    define('TITULO_WEB', 'COSTUSHOP - Arreglos de calidad'); //Modificar el titulo
     define('MENSAJE_BIENVENIDA', 'Buen  Dia!');
     define('LOGO_TICKET', 'logo_blanco.png');
     
@@ -57,12 +57,11 @@ Logos.
 
 Los logos que se encuentran en:
     
-     costurita/logos/costurita 
-     costurita/logos/costushop
+     costushop/logos/costushop 
 
 Moverlos a:
 
-     costurita/img
+     costushop/img
      
 El usuario inicial sera:
 

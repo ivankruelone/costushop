@@ -16,13 +16,13 @@
     $dia2 = new DateTime($row->fecha_entrega);
 	
 	$dia = array(
-			'1' => 'DOM',
-			'2' => 'LUN',
-			'3' => 'MAR',
-			'4' => 'MIE',
-			'5' => 'JUE',
-			'6' => 'VIE',
-			'7' => 'SAB'
+			'1' => 'DOMINGO',
+			'2' => 'LUNES',
+			'3' => 'MARTES',
+			'4' => 'MIERCOLES',
+			'5' => 'JUEVES',
+			'6' => 'VIERNES',
+			'7' => 'SABADO'
 			);
 
 ?>

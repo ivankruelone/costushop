@@ -420,12 +420,28 @@ class Recepcion_model extends CI_Model
             } elseif ($row->id_status == 4) {
                 $color = 'blue';
             }
+            
+            $telefono = "<br /><font color=\"red\">(";
+            if(strlen(trim($row->telcel)) > 0){
+                $telefono .= $row->telcel;
+            }
+            
+            if( strlen(trim($row->telcel)) > 0 && strlen(trim($row->telcasa)) > 0)
+            {
+                $telefono .= $telefono . " &oacute; " . $row->telcasa;
+            }else{
+                $telefono .= $row->telcasa;
+            }
+            
+            $telefono .= ")</font>";
+            
+            
 
             //id, nombre, dire, descu, rfc, correo, telcasa, teltra, telcel, tipo
             $tabla .= "
             <tr id=\"tablatr_" . $row->id . "\">
             <td align=\"center\">" . $row->id . "</td>
-            <td align=\"left\">" . $row->nombre . "</td>
+            <td align=\"left\">" . $row->nombre . $telefono . "</td>
             <td align=\"left\">" . $row->fecha_alta . "</td>
             <td align=\"left\">" . $row->fecha_entrega . "</td>
             <td align=\"left\"><span class=\"tag $color\" style=\"font-size: 8px;\">" .
@@ -1214,7 +1230,7 @@ left join prendas p2 on a.prenda_nueva = p2.id
 
     function get_ordenes($estatus, $limit, $offset)
     {
-        $this->db->select('o.*, c.nombre, e.nombre as estatusx');
+        $this->db->select('o.*, c.nombre, e.nombre as estatusx, telcel, telcasa');
         $this->db->from('orden_c o');
         $this->db->join('clientes c', 'o.id_cliente = c.id', 'LEFT');
         $this->db->join('estatus e', 'o.id_status = e.id', 'LEFT');
@@ -1251,7 +1267,7 @@ left join prendas p2 on a.prenda_nueva = p2.id
 
     function get_ordenes_cliente($cliente)
     {
-        $this->db->select('o.*, c.nombre, e.nombre as estatusx');
+        $this->db->select('o.*, c.nombre, e.nombre as estatusx, telcel, telcasa');
         $this->db->from('orden_c o');
         $this->db->join('clientes c', 'o.id_cliente = c.id', 'LEFT');
         $this->db->join('estatus e', 'o.id_status = e.id', 'LEFT');
@@ -1265,7 +1281,7 @@ left join prendas p2 on a.prenda_nueva = p2.id
 
     function get_ordenes_id($orden)
     {
-        $this->db->select('o.*, c.nombre, e.nombre as estatusx');
+        $this->db->select('o.*, c.nombre, e.nombre as estatusx, telcel, telcasa');
         $this->db->from('orden_c o');
         $this->db->join('clientes c', 'o.id_cliente = c.id', 'LEFT');
         $this->db->join('estatus e', 'o.id_status = e.id', 'LEFT');
@@ -1279,7 +1295,7 @@ left join prendas p2 on a.prenda_nueva = p2.id
 
     function get_entregas_pendientes()
     {
-        $this->db->select('o.*, c.nombre, e.nombre as estatusx');
+        $this->db->select('o.*, c.nombre, e.nombre as estatusx, telcel, telcasa');
         $this->db->from('orden_c o');
         $this->db->join('clientes c', 'o.id_cliente = c.id', 'LEFT');
         $this->db->join('estatus e', 'o.id_status = e.id', 'LEFT');
@@ -1293,7 +1309,7 @@ left join prendas p2 on a.prenda_nueva = p2.id
 
     function get_entregas_hoy()
     {
-        $this->db->select('o.*, c.nombre, e.nombre as estatusx');
+        $this->db->select('o.*, c.nombre, e.nombre as estatusx, telcel, telcasa');
         $this->db->from('orden_c o');
         $this->db->join('clientes c', 'o.id_cliente = c.id', 'LEFT');
         $this->db->join('estatus e', 'o.id_status = e.id', 'LEFT');

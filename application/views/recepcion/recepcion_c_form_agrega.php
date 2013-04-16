@@ -222,6 +222,9 @@
        echo anchor_popup('recepcion/talon/'.$id, 'Imprimir Talon de Servicio', $atts2);
        echo '</span>';
 	   echo '<span style="padding-left: 10px; padding-right: 10px;">';
+       echo anchor_popup('recepcion/tintoreria/'.$id, 'Tintoreria', $atts2);
+       echo '</span>';
+	   echo '<span style="padding-left: 10px; padding-right: 10px;">';
        echo anchor('', 'Cancelar Orden', array('class' => 'button reed', 'id' => 'cancela_orden'));
        echo '</span>';
 	}elseif($orden->id_status == 4){

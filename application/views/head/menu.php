@@ -36,7 +36,7 @@
 				<li<?php if($menu == "recepcion")echo ' class="current"';?>>
 					<?php echo anchor('recepcion', 'Ordenes' , 'class="dashboard"')?>
                     <ul>
-                        <li><?php echo anchor('recepcion/ordenes/1', 'PENDIENTES')?></li>
+                        <li><?php echo anchor('recepcion/ordenes/1', 'PENDIENTE')?></li>
                         <li><?php echo anchor('recepcion/ordenes/2', 'CANCELADO')?></li>
                         <li><?php echo anchor('recepcion/ordenes/3', 'EN PROCESO')?></li>
                         <li><?php echo anchor('recepcion/ordenes/4', 'ENTREGADO')?></li>

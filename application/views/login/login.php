@@ -26,7 +26,7 @@
 <body class="login">
 	<section role="main">
 	
-		<a href="/costurita"></a>
+		<a href="/costushop"></a>
 	
 		<!-- Login box -->
 		<article id="login-box">

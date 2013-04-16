@@ -341,6 +341,15 @@ class Recepcion extends CI_Controller
         $this->load->view('recepcion/talon', $data);
     }
 
+    function tintoreria($id)
+    {
+        $this->load->model('recepcion_model');
+        $data['datos'] = $this->recepcion_model->get_parametros();
+        $data['row'] = $this->recepcion_model->get_orden($id);
+        $data['query2'] = $this->recepcion_model->detalle($id);
+        $this->load->view('recepcion/tintoreria', $data);
+    }
+
     public function caja()
     {
         $data = array();
