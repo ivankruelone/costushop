@@ -22,6 +22,13 @@
 										</dd>
 
 										<dt>
+										<dt>
+											<label>Password para reimpresiones</label>
+										</dt>
+										<dd>
+											<input class="small" type="password" id="password2" name="password2" maxlength="20" value="<?php echo $row->password2; ?>" required />
+										</dd>
+
 											<label>Nombre</label>
 										</dt>
 										<dd>
@@ -39,7 +46,7 @@
 											<label>Status</label>
 										</dt>
 										<dd>
-											<?php echo form_dropdown('tipo', array('0' => 'Inactivo', '1' => 'Activo'), $row->tipo, array('id' => 'tipo')) ?>
+											<?php echo form_dropdown('tipo', array('0' => 'Inactivo', '1' => 'Activo'), $row->tipo, 'id="tipo"') ?>
 										</dd>
 
 										<dt>
@@ -66,16 +73,20 @@
             event.preventDefault();
             var username = $('#username').attr('value');
             var password = $('#password').attr('value');
+            var password2 = $('#password2').attr('value');
             var nombre = $('#nombre').attr('value');
             var email = $('#emal').attr('value');
             var id = $('#id').attr('value');
             var tipo = $('#tipo').attr('value');
+            
+            alert(tipo);
             
             var url = "<?php echo site_url();?>/catalogo/cambia_usuario_submit";
 
                 var variables = {
                     username: username,
                     password: password,
+                    password2: password2,
                     nombre: nombre,
                     email: email,
                     id: id,
@@ -87,7 +98,7 @@
                     if(data > 0){
                         window.location = "<?php echo site_url();?>/catalogo/usuarios";
                     }else{
-                        alert('No se pudo agregar el usuario');
+                        alert('No se pudo actualizar el usuario');
                     }
                 });
 

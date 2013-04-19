@@ -19,6 +19,7 @@
                         <li><?php echo anchor('catalogo/index', 'Clientes')?></li>
                         <li><?php echo anchor('catalogo/tabla_prendas', 'Prendas')?></li>
                         <li><?php echo anchor('catalogo/tabla_servicios', 'Servicios')?></li>
+                        <li><?php echo anchor('catalogo/tabla_condiciones', 'Condiciones')?></li>
                         <li><?php echo anchor('catalogo/usuarios', 'Usuarios')?></li>
                         
                     </ul>
@@ -51,6 +52,8 @@
                         <li><?php echo anchor('recepcion/clientes', 'Clientes')?></li>
                         <li><?php echo anchor('recepcion/canceladas', 'Canceladas')?></li>
                         <li><?php echo anchor('recepcion/servicios', 'Servicios')?></li>
+                        <li><?php echo anchor('recepcion/reimpresiones', 'Reimpresiones')?></li>
+                        <li><?php echo anchor('recepcion/cuota', 'Cuota')?></li>
                     </ul>
                 </li> <!-- Use class .no-submenu to open link instead of a sub menu-->
 
@@ -58,6 +61,10 @@
                 <?php echo anchor('recepcion/configuracion', 'Configuracion', 'class="no-submenu"')?>
 				</li>
                 
+                <li>
+                <?php echo anchor('recepcion/fechayhora', 'Fecha y hora', 'class="no-submenu"')?>
+				</li>
+
                 <li>
                 <?php echo anchor('login/logout', 'Cerrar sesi&ocirc;n', 'class="no-submenu"')?>
 				</li>

@@ -98,6 +98,9 @@
 	<script src="<?php echo base_url();?>js/jquery/jquery.visualize.js"></script>
 	<script src="<?php echo base_url();?>js/jquery/jquery.visualize.tooltip.js"></script>
 	<script src="<?php echo base_url();?>js/script.js"></script>
+	<script src="<?php echo base_url();?>js/hc/highcharts.js"></script>
+	<script src="<?php echo base_url();?>js/hc/modules/exporting.js"></script>
+    
 
 <link rel="stylesheet" href="<?php echo base_url();?>css/themes/base/jquery.ui.all.css" />
 <script src="<?php echo base_url();?>js/ui/jquery.ui.core.min.js"></script>

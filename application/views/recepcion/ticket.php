@@ -37,7 +37,7 @@
                 <br />R. F. C. <?php echo $dat->rfc; ?>
                 <br /><?php echo $dat->regimen; ?>
     </div>
-    <div align="center" style="font-size: x-small;">
+    <div align="right" style="font-size: x-small;">
                 No. Orden: <strong><?php echo $row->id; ?></strong>
     </div>
     <div>
@@ -138,6 +138,21 @@
     </tr>
 
     <tr>
+        <td colspan="6" style="background-color: black; color: white; font-weight: bolder; text-align: left;">
+            <ul>
+                <?php
+                
+                foreach($query3->result() as $row3)
+                {
+                    echo "<li>$row3->condicion</li>";
+                }
+                
+                ?>
+            </ul>
+        </td>
+    </tr>
+
+    <tr>
         <td colspan="6" align="center"><?php echo $dat->direccion; ?></td>
     </tr>
 </table>
@@ -162,3 +177,14 @@ $(document).ready(function(){
 });
 </script>
 </html>
+
+<?php
+//id, id_orden, fecha, tipo
+$data = array(
+   'id_orden' => $row->id ,
+   'tipo' => 'ticket',
+   'id_usuario' => $this->session->userdata('id')
+);
+$this->db->set('fecha', 'now()', false);
+$this->db->insert('audita_impresiones', $data); 
+?>

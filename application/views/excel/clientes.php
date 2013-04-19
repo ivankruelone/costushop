@@ -99,7 +99,7 @@ $objPHPExcel->getActiveSheet()->setCellValue('K'.$num,'=SUM(K5:K'.$num2.')');
         $num3 = $num + 2;
 
 $objPHPExcel->setActiveSheetIndex(0)
-            ->setCellValue('C'.$num3, date('Y-m-d H:s:i'))
+            ->setCellValue('C'.$num3, date('Y-m-d H:i:s'))
             ;
 
 

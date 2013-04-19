@@ -766,6 +766,7 @@ class Catalogo extends CI_Controller
         //id, username, password, nivel, tipo, nombre, puesto, email, avatar
         $data->username = $this->input->post('username');
         $data->password = $this->input->post('password');
+        $data->password2 = $this->input->post('password2');
         $data->nivel = 2;
         $data->tipo = 1;
         $data->nombre = $this->input->post('nombre');
@@ -801,16 +802,79 @@ class Catalogo extends CI_Controller
         //id, username, password, nivel, tipo, nombre, puesto, email, avatar
         $data->username = $this->input->post('username');
         $data->password = $this->input->post('password');
+        $data->password2 = $this->input->post('password2');
         $data->tipo = $this->input->post('tipo');
-        ;
         $data->nombre = $this->input->post('nombre');
         $data->email = $this->input->post('email');
 
         $this->db->where('id', $this->input->post('id'));
         $this->db->update('usuarios', $data);
+        
         echo $this->db->affected_rows();
     }
     
+    public function tabla_condiciones()
+    {
+        $data = array();
+        $data['menu'] = 'inicio';
+        $data['submenu'] = 'completo';
+        //$data['sidebar'] = "head/sidebar";
+        //$data['widgets'] = "main/widgets";
+        $data['dondeestoy'] = "main/dondeestoy";
+        $this->load->model('catalogo_model');
+        $data['titulo'] = "CATALOGO DE CONDICIONES";
+        $data['contenido'] = "catalogo/condiciones_c_form_agrega";
+        $data['tabla'] = $this->catalogo_model->condiciones();
+
+        $this->load->view('header');
+        $this->load->view('main', $data);
+    }
+
+    function insert_condicion()
+    {
+        $nom = $this->input->post('nom');
+
+        $this->load->model('catalogo_model');
+        $this->catalogo_model->create_member_condicion($nom);
+        redirect('catalogo/tabla_condiciones');
+
+    }
+
+    public function cambia_condicion($id)
+    {
+
+        $data = array();
+        $data['menu'] = 'inicio';
+        $data['submenu'] = 'completo';
+        //$data['sidebar'] = "head/sidebar";
+        //$data['widgets'] = "main/widgets";
+        $data['dondeestoy'] = "main/dondeestoy";
+        $this->load->model('catalogo_model');
+        $trae = $this->catalogo_model->trae_datos_condicion($id);
+        $row = $trae->row();
+        $data['id'] = $id;
+        $data['nom'] = $row->condicion;
+        $data['tipo'] = $row->tipo;
+
+
+        $data['titulo'] = "CAMBIAR CONDICION";
+        $data['contenido'] = "catalogo/condicion_c_form_cambia";
+        $data['tabla'] = '';
+
+        $this->load->view('header');
+        $this->load->view('main', $data);
+    }
+
+    function cambia_condicion_submit()
+    {
+        $id = $this->input->post('id');
+        $condicion = $this->input->post('nom');
+        $tipo = $this->input->post('tipo');
+
+        $this->load->model('catalogo_model');
+        $this->catalogo_model->update_member_condicion($id, $condicion, $tipo);
+        redirect('catalogo/tabla_condiciones');
+    }
 
 }
 

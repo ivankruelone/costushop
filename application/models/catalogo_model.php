@@ -324,6 +324,57 @@ class Catalogo_model extends CI_Model
     }
 
 
+    function condiciones()
+    {
+        $sql = "SELECT * FROM condiciones;";
+        $query = $this->db->query($sql);
+
+
+        $tabla = "
+        <table id=\"hor-minimalist-b\">
+        <thead>
+        
+        
+        
+        <tr>
+        <th>Id</th>
+        <th align=\"left\">Nombre</th>
+        
+        <th></th>
+        
+        </tr>
+        </thead>
+        <tbody>
+        ";
+
+        foreach ($query->result() as $row) {
+            if ($row->tipo == 1) {
+                $color = '#000000';
+            } else {
+                $color = '#FC0505';
+            }
+            $l1 = anchor('catalogo/cambia_condicion/' . $row->id, '<img src="' . base_url() .
+                'img/edit.png" border="0" width="20px" /></a>', array('title' =>
+                    'Haz Click aqui para cambiar las condiciones!', 'class' => 'encabezado'));
+            //id, nombre, dire, descu, rfc, correo, telcasa, teltra, telcel, tipo
+            $tabla .= "
+            <tr>
+            <td align=\"center\"><font color=\"$color\">" . $row->id .
+                "</font></td>
+            <td align=\"left\"><font color=\"$color\">" . $row->condicion .
+                "</font></td>
+            <td align=\"right\"><font color=\"$color\">" . $l1 . "</font></td>
+            </tr>
+            ";
+        }
+
+        $tabla .= "
+        </tbody>
+        </table>";
+
+        return $tabla;
+    }
+
     function servicios_de_prenda($prenda)
     {
         $this->db->where('prenda', $prenda);
@@ -351,9 +402,25 @@ class Catalogo_model extends CI_Model
 
     }
 
+    function create_member_condicion($nom)
+    {
+
+        $new_member_insert_data = array('condicion' => trim($nom), 'tipo' => 1);
+
+        $insert = $this->db->insert('condiciones', $new_member_insert_data);
+
+    }
+
     function trae_datos_prendas($id)
     {
         $sql = "SELECT *  FROM prendas  where id= ? ";
+        $query = $this->db->query($sql, array($id));
+        return $query;
+    }
+
+    function trae_datos_condicion($id)
+    {
+        $sql = "SELECT *  FROM condiciones  where id= ? ";
         $query = $this->db->query($sql, array($id));
         return $query;
     }
@@ -377,6 +444,16 @@ class Catalogo_model extends CI_Model
 
         $this->db->where('id', $id);
         $this->db->update('prendas', $data);
+
+    }
+
+    function update_member_condicion($id, $condicion, $tipo)
+    {
+
+        $data = array('condicion' => trim($condicion), 'tipo' => $tipo);
+
+        $this->db->where('id', $id);
+        $this->db->update('condiciones', $data);
 
     }
 
@@ -612,7 +689,7 @@ class Catalogo_model extends CI_Model
             'nombre' => strtoupper(trim($nom)),
             'prenda' => $pre,
             'precio' => $precio,
-            'fecha' => date('Y-m-d H:m'),
+            'fecha' => date('Y-m-d H:i'),
             'tipo' => 1);
 
         $this->db->insert('servicios', $new_member_insert_data);
@@ -635,7 +712,7 @@ class Catalogo_model extends CI_Model
             'nombre' => strtoupper(trim($nom)),
             'prenda' => $pre,
             'precio' => $precio,
-            'fecha' => date('Y-m-d H:m'),
+            'fecha' => date('Y-m-d H:i'),
             'tipo' => $tipo);
 
         $this->db->where('id', $id);
@@ -716,5 +793,14 @@ class Catalogo_model extends CI_Model
         </table>";
 
         return $tabla;
+    }
+
+    function busca_condiciones($id)
+    {
+        $sql = "select id, condicion, case when a.orden_id is null then '' else 'true' end as checado from condiciones c
+left join orden_a a on c.id = a.condicion_id and a.orden_id = ?
+where tipo = 1;";
+        $query = $this->db->query($sql, $id);
+        return $query;
     }
 }

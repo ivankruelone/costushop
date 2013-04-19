@@ -54,10 +54,12 @@ class Recepcion extends CI_Controller
         $this->load->model('catalogo_model');
         $data['hora'] = $this->catalogo_model->busca_hora();
         $data['prenda'] = $this->catalogo_model->busca_prenda();
+        $data['condiciones'] = $this->catalogo_model->busca_condiciones($id);
         $data['id'] = $id;
         $this->load->model('recepcion_model');
         $data['orden'] = $this->recepcion_model->get_orden($id);
         $data['pagos_en_orden'] = $this->recepcion_model->abonos_sin_accion($id);
+        $data['impresiones'] = $this->recepcion_model->reimpresiones_orden($id);
 
         $data['titulo'] = "RECEPCION";
         $data['contenido'] = "recepcion/recepcion_c_form_agrega";
@@ -149,12 +151,18 @@ class Recepcion extends CI_Controller
 
     function cambia_fecha_entrega()
     {
-        $data->fecha_entrega = $this->input->post('fecha_entrega');
+        $fecha = $this->input->post('fecha_entrega');
+        $this->load->model('recepcion_model');
+        
+        $fecha = $this->recepcion_model->fecha_alta_guarda($fecha);
+        
+        
+        $data->fecha_entrega = $fecha;
         $this->db->where('id', $this->input->post('id'));
 
         $this->db->update('orden_c', $data);
     }
-
+    
     function cambia_hora_entrega()
     {
         $data->hora_entrega = $this->input->post('hora_entrega');
@@ -322,6 +330,126 @@ class Recepcion extends CI_Controller
         $data['query2'] = $this->recepcion_model->detalle($id);
         $this->load->view('recepcion/comprobante', $data);
     }
+    
+    function ticket_verifica($id)
+    {
+        $this->load->model('recepcion_model');
+        $res = $this->recepcion_model->verifica_impresion($id, 'ticket');
+        if($res == FALSE){
+            redirect('recepcion/ticket/'.$id);
+        }else{
+            redirect('recepcion/ticket_password/'.$id);
+        }
+    }
+
+    function ticket_password($id, $error = 0)
+    {
+        $data['id'] = $id;
+        if($error == 1){
+            $data['error'] = "<font color\"red\">Contrase&ntilde;a incorrecta.</font>";
+        }else{
+            $data['error'] = "";
+        }
+        $this->load->model('recepcion_model');
+        $this->load->view('recepcion/ticket_password', $data);
+    }
+
+    function ticket_password_submit()
+    {
+        $id = $this->input->post('id');
+        $password = $this->input->post('clave');
+        $username = $this->session->userdata('username');
+        
+        $this->load->model('recepcion_model');
+        $res = $this->recepcion_model->verifica_password($username, $password);
+        
+        if($res == TRUE){
+            redirect('recepcion/ticket/'.$id);
+        }else{
+            redirect('recepcion/ticket_password/'.$id.'/1');
+        }
+        
+    }
+
+    function talon_verifica($id)
+    {
+        $this->load->model('recepcion_model');
+        $res = $this->recepcion_model->verifica_impresion($id, 'talon');
+        if($res == FALSE){
+            redirect('recepcion/talon/'.$id);
+        }else{
+            redirect('recepcion/talon_password/'.$id);
+        }
+    }
+
+    function talon_password($id, $error = 0)
+    {
+        $data['id'] = $id;
+        if($error == 1){
+            $data['error'] = "<font color\"red\">Contrase&ntilde;a incorrecta.</font>";
+        }else{
+            $data['error'] = "";
+        }
+        $this->load->model('recepcion_model');
+        $this->load->view('recepcion/talon_password', $data);
+    }
+
+    function talon_password_submit()
+    {
+        $id = $this->input->post('id');
+        $password = $this->input->post('clave');
+        $username = $this->session->userdata('username');
+        
+        $this->load->model('recepcion_model');
+        $res = $this->recepcion_model->verifica_password($username, $password);
+        
+        if($res == TRUE){
+            redirect('recepcion/talon/'.$id);
+        }else{
+            redirect('recepcion/talon_password/'.$id.'/1');
+        }
+        
+    }
+
+    function tintoreria_verifica($id)
+    {
+        $this->load->model('recepcion_model');
+        $res = $this->recepcion_model->verifica_impresion($id, 'tintoreria');
+        if($res == FALSE){
+            redirect('recepcion/tintoreria/'.$id);
+        }else{
+            redirect('recepcion/tintoreria_password/'.$id);
+        }
+    }
+
+    function tintoreria_password($id, $error = 0)
+    {
+        $data['id'] = $id;
+        if($error == 1){
+            $data['error'] = "<font color\"red\">Contrase&ntilde;a incorrecta.</font>";
+        }else{
+            $data['error'] = "";
+        }
+        $this->load->model('recepcion_model');
+        $this->load->view('recepcion/tintoreria_password', $data);
+    }
+
+    function tintoreria_password_submit()
+    {
+        $id = $this->input->post('id');
+        $password = $this->input->post('clave');
+        $username = $this->session->userdata('username');
+        
+        $this->load->model('recepcion_model');
+        $res = $this->recepcion_model->verifica_password($username, $password);
+        
+        if($res == TRUE){
+            redirect('recepcion/tintoreria/'.$id);
+        }else{
+            redirect('recepcion/tintoreria_password/'.$id.'/1');
+        }
+        
+    }
 
     function ticket($id)
     {
@@ -329,6 +457,7 @@ class Recepcion extends CI_Controller
         $data['datos'] = $this->recepcion_model->get_parametros();
         $data['row'] = $this->recepcion_model->get_orden($id);
         $data['query2'] = $this->recepcion_model->detalle($id);
+        $data['query3'] = $this->recepcion_model->condiciones_orden($id);
         $this->load->view('recepcion/ticket', $data);
     }
 
@@ -338,6 +467,7 @@ class Recepcion extends CI_Controller
         $data['datos'] = $this->recepcion_model->get_parametros();
         $data['row'] = $this->recepcion_model->get_orden($id);
         $data['query2'] = $this->recepcion_model->detalle($id);
+        $data['query3'] = $this->recepcion_model->condiciones_orden($id);
         $this->load->view('recepcion/talon', $data);
     }
 
@@ -347,6 +477,7 @@ class Recepcion extends CI_Controller
         $data['datos'] = $this->recepcion_model->get_parametros();
         $data['row'] = $this->recepcion_model->get_orden($id);
         $data['query2'] = $this->recepcion_model->detalle($id);
+        $data['query3'] = $this->recepcion_model->condiciones_orden($id);
         $this->load->view('recepcion/tintoreria', $data);
     }
 
@@ -606,6 +737,79 @@ class Recepcion extends CI_Controller
         $this->load->view('excel/servicios', $data);
     }
 
+    public function reimpresiones()
+    {
+        $data = array();
+        $data['menu'] = 'inicio';
+        $data['submenu'] = 'completo';
+        //$data['sidebar'] = "head/sidebar";
+        //$data['widgets'] = "main/widgets";
+        $data['dondeestoy'] = "main/dondeestoy";
+        $data['titulo'] = "Reporte de Reimpresiones";
+        $data['contenido'] = "recepcion/reimpresiones";
+
+        $this->load->model('recepcion_model');
+        $data['estatus'] = $this->recepcion_model->reimpresion_combo();
+
+        $this->load->view('header');
+        $this->load->view('main', $data);
+    }
+
+
+    public function reimpresiones_submit()
+    {
+        $data = array();
+        $data['menu'] = 'inicio';
+        $data['submenu'] = 'completo';
+        $this->load->model('recepcion_model');
+        $data['tabla'] = $this->recepcion_model->reimpresiones();
+        $data['estatus'] = $this->recepcion_model->reimpresion_combo();
+        //$data['sidebar'] = "head/sidebar";
+        //$data['widgets'] = "main/widgets";
+        $data['dondeestoy'] = "main/dondeestoy";
+        $data['titulo'] = "Reporte de Reimpresiones";
+        $data['contenido'] = "recepcion/reimpresiones";
+
+        $this->load->view('header');
+        $this->load->view('main', $data);
+    }
+
+    public function cuota()
+    {
+        $data = array();
+        $data['menu'] = 'inicio';
+        $data['submenu'] = 'completo';
+        //$data['sidebar'] = "head/sidebar";
+        //$data['widgets'] = "main/widgets";
+        $data['dondeestoy'] = "main/dondeestoy";
+        $data['titulo'] = "Reporte de cuota de venta";
+        $data['contenido'] = "recepcion/cuota";
+
+        $this->load->model('recepcion_model');
+
+        $this->load->view('header');
+        $this->load->view('main', $data);
+    }
+
+    public function cuota_submit()
+    {
+        $data = array();
+        $data['menu'] = 'inicio';
+        $data['submenu'] = 'completo';
+        $this->load->model('recepcion_model');
+        $data['tabla'] = $this->recepcion_model->cuota();
+        $data['titulo_grafica'] = $this->recepcion_model->cuota_titulo();
+        $data['arreglo'] = $this->recepcion_model->cuota_arreglo();
+        //$data['sidebar'] = "head/sidebar";
+        //$data['widgets'] = "main/widgets";
+        $data['dondeestoy'] = "main/dondeestoy";
+        $data['titulo'] = "Reporte de cuota de venta";
+        $data['contenido'] = "recepcion/cuota";
+
+        $this->load->view('header');
+        $this->load->view('main', $data);
+    }
+
     public function cat_clientes()
     {
         $data = array();
@@ -640,6 +844,23 @@ class Recepcion extends CI_Controller
         $this->load->view('main', $data);
     }
 
+    public function fechayhora()
+    {
+        $data = array();
+        $data['menu'] = 'inicio';
+        $data['submenu'] = 'completo';
+        //$data['sidebar'] = "head/sidebar";
+        //$data['widgets'] = "main/widgets";
+        $data['dondeestoy'] = "main/dondeestoy";
+
+        $data['titulo'] = "Fecha y Hora";
+        $data['contenido'] = "recepcion/fechayhora";
+        //$data['tabla'] = $this->recepcion_model->control();
+
+        $this->load->view('header');
+        $this->load->view('main', $data);
+    }
+
     public function cambia_configuracion()
     {
         $this->db->set($this->input->post('variable'), $this->input->post('valor'));
@@ -660,7 +881,46 @@ class Recepcion extends CI_Controller
         echo "<h2>Observaci&oacute;n sobre el cliente</h2>";
         echo $this->catalogo_model->observacion_cliente($id);
     }
+
+    function fecha_alta()
+    {
+        
+        for ($i = 2; ; $i++) {
+            
+            $sql = "select date_add(date(now()), interval $i day) as fecha, dayofweek(date_add(date(now()), interval $i day)) as dia;";
+            $q = $this->db->query($sql);
+            $r = $q->row();
+            
+            echo $i."<br />";
+
+            if ((int)$r->dia != (int)5) {
+                
+                break;
+            }
+            
+        }
+        
+        echo $r->fecha;
+        
+    }
+    
+    function condiciones()
+    {
+        $orden_id = $this->input->post('orden_id');
+        $condicion_id = $this->input->post('condicion_id');
+        $checada = $this->input->post('checada');
+        
+        $this->load->model('recepcion_model');
+        
+        if($checada == "true"){
+            $this->recepcion_model->inserta_condicion($orden_id, $condicion_id);
+        }else{
+            $this->recepcion_model->borra_condicion($orden_id, $condicion_id);
+        }
+    }
+    
 }
+
 
 /* End of file recepcion.php */
 /* Location: ./application/controllers/recepcion.php */

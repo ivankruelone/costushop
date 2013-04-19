@@ -65,6 +65,38 @@
 											<p>Direccion para mostrar</p>
 										</dd>
 
+										<dt>
+											<label>Hora de entrega Lunes a Viernes</label>
+										</dt>
+										<dd>
+											<input class="small" type="text" id="entregalv" name="entregalv" maxlength="8" value="<?php echo $row->entregalv; ?>" required />
+											<p>Aqui va la hora de entrega formato (HH:mm:ss)</p>
+										</dd>
+
+										<dt>
+											<label>Hora de entrega Sabado</label>
+										</dt>
+										<dd>
+											<input class="small" type="text" id="entregas" name="entregas" maxlength="8" value="<?php echo $row->entregas; ?>" required />
+											<p>Aqui va la hora de entrega formato (HH:mm:ss)</p>
+										</dd>
+
+										<dt>
+											<label>Hora de entrega Domingo</label>
+										</dt>
+										<dd>
+											<input class="small" type="text" id="entregad" name="entregad" maxlength="8" value="<?php echo $row->entregad; ?>" required />
+											<p>Aqui va la hora de entrega formato (HH:mm:ss)</p>
+										</dd>
+
+										<dt>
+											<label>Abre los domingos</label>
+										</dt>
+										<dd>
+											<?php echo form_dropdown('abredomingo', array('0' => 'No', '1' => 'Si'), $row->abredomingo, 'id="abredomingo"');?>
+											<p>Indica si la sucursal abre en domingo.</p>
+										</dd>
+
                                     </dl>
                                 </fieldset>
 </form>

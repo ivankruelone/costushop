@@ -141,7 +141,7 @@ $objPHPExcel->setActiveSheetIndex(0)->setCellValue('D'.$num3, $venta);
         $num3 = $num3 + 2;
 
 $objPHPExcel->setActiveSheetIndex(0)
-            ->setCellValue('C'.$num3, date('Y-m-d H:s:i'))
+            ->setCellValue('C'.$num3, date('Y-m-d H:i:s'))
             ;
 
 

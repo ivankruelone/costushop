@@ -99,7 +99,11 @@
             );
     
     
-    if($orden->id_status <> 1){
+    if($orden->id_status == 1){
+        
+        $desha = null;
+        
+    }elseif($orden->id_status == 2){
         
         $a = array('disabled' => 'disabled');
         
@@ -111,9 +115,28 @@
         $data_can = array_merge($data_can, $a);
         $desha = ' disabled="disabled"';
         
-    }else{
+    }elseif($orden->id_status == 3){
         
-        $desha = null;
+        $a = array('disabled' => 'disabled');
+        
+        $data_nom = array_merge($data_nom, $a);
+        $data_fecha_entrega = array_merge($data_fecha_entrega, $a);
+        $data_prendas = array_merge($data_prendas, $a);
+        $data_descu = array_merge($data_descu, $a);
+        $data_can = array_merge($data_can, $a);
+        $desha = ' disabled="disabled"';
+        
+    }elseif($orden->id_status == 4){
+        
+        $a = array('disabled' => 'disabled');
+        
+        $data_nom = array_merge($data_nom, $a);
+        $data_fecha_entrega = array_merge($data_fecha_entrega, $a);
+        $data_prendas = array_merge($data_prendas, $a);
+        $data_descu = array_merge($data_descu, $a);
+        $data_obser = array_merge($data_obser, $a);
+        $data_can = array_merge($data_can, $a);
+        $desha = ' disabled="disabled"';
         
     }
     
@@ -158,6 +181,25 @@
 ?>
 <tr>
     <td colspan="4"><?php echo form_textarea($data_obser);?></td>
+</tr>
+
+<tr>
+    <td colspan="4">
+    
+    <?php foreach($condiciones->result() as $condicion){
+        
+        if($orden->id_status == 4 || $orden->id_status == 2){
+            $desha1 = ' disabled="disabled"';
+        }else{
+            $desha1 = null;
+        }
+    
+        echo form_checkbox("condicion".$condicion->id, $condicion->id, $condicion->checado, 'id="condicion'.$condicion->id.'"'.$desha1)."<b>".$condicion->condicion."</b>";
+    
+    }
+    ?>
+    
+    </td>
 </tr>
 
 <tr>
@@ -216,13 +258,13 @@
 //       echo anchor_popup('recepcion/comprobante/'.$id, 'Imprimir Recibo', $atts);
 //       echo '</span>';
 	   echo '<span style="padding-left: 10px; padding-right: 10px;">';
-       echo anchor_popup('recepcion/ticket/'.$id, 'Imprimir Ticket', $atts2);
+       echo anchor_popup('recepcion/ticket_verifica/'.$id, 'Imprimir Ticket', $atts2);
        echo '</span>';
 	   echo '<span style="padding-left: 10px; padding-right: 10px;">';
-       echo anchor_popup('recepcion/talon/'.$id, 'Imprimir Talon de Servicio', $atts2);
+       echo anchor_popup('recepcion/talon_verifica/'.$id, 'Imprimir Talon de Servicio', $atts2);
        echo '</span>';
 	   echo '<span style="padding-left: 10px; padding-right: 10px;">';
-       echo anchor_popup('recepcion/tintoreria/'.$id, 'Tintoreria', $atts2);
+       echo anchor_popup('recepcion/tintoreria_verifica/'.$id, 'Tintoreria', $atts2);
        echo '</span>';
 	   echo '<span style="padding-left: 10px; padding-right: 10px;">';
        echo anchor('', 'Cancelar Orden', array('class' => 'button reed', 'id' => 'cancela_orden'));
@@ -256,10 +298,13 @@
 //       echo anchor_popup('recepcion/comprobante/'.$id, 'Imprimir Recibo', $atts);
 //       echo '</span>';
 	   echo '<span style="padding-left: 10px; padding-right: 10px;">';
-       echo anchor_popup('recepcion/ticket/'.$id, 'Imprimir Ticket', $atts2);
+       echo anchor_popup('recepcion/ticket_verifica/'.$id, 'Imprimir Ticket', $atts2);
        echo '</span>';
 	   echo '<span style="padding-left: 10px; padding-right: 10px;">';
-       echo anchor_popup('recepcion/talon/'.$id, 'Imprimir Talon de Servicio', $atts2);
+       echo anchor_popup('recepcion/talon_verifica/'.$id, 'Imprimir Talon de Servicio', $atts2);
+       echo '</span>';
+	   echo '<span style="padding-left: 10px; padding-right: 10px;">';
+       echo anchor_popup('recepcion/tintoreria_verifica/'.$id, 'Tintoreria', $atts2);
        echo '</span>';
 	   if($this->session->userdata('nivel') == 1){
 	   echo '<span style="padding-left: 10px; padding-right: 10px;">';
@@ -269,14 +314,14 @@
 	}
 ?>
 </td>
+</tr>
+</table>
 <input type="hidden" value="0" name="valida" id="valida" />
 <input type="hidden" value="<?php echo $orden->id_cliente; ?>" name="cliente_id" id="cliente_id" />
 <input type="hidden" value="<?php echo $id; ?>" name="id" id="id" />
-</tr>
   <?php
 	echo form_close();
   ?>
-</table>
 
 <div id="tabla_recepcion">
 </div>
@@ -364,8 +409,6 @@
   ?>
   
   <table>
-<tr>
-
  <tr>
 	<td>Nombre del cliente: </td>
 	<td><?php echo form_input($data_nom, "", 'required');?><span id="mensaje"></span></td>
@@ -397,8 +440,9 @@
 	<td>Trabajo:<?php echo form_input($data_ttra);?><span id="mensaje"></span></td>
     <td> Celular<?php echo form_input($data_tcel);?><span id="mensaje"></span></td>
 </tr>
+<tr>
 
-	<td colspan="6"><?php echo form_submit('envio', 'AGREGAR CLIENTE');?></td>
+	<td colspan="4"><?php echo form_submit('envio', 'AGREGAR CLIENTE');?></td>
 </tr>
 </table>
   <?php
@@ -436,7 +480,6 @@
   
   <table>
 <tr>
-<tr>
 	<td>Prenda: </td>
 	<td align="left"><?php echo form_dropdown('prenda_nueva', $prenda, '', 'id="prenda_nueva"') ;?> </td>
 </tr>
@@ -450,9 +493,9 @@
 	<td><?php echo form_input($data_precio, "", 'required');?><span id="mensaje"></span></td>
 
 </tr>
+<tr>
 
-
-	<td colspan="6"><?php echo form_submit('envio', 'AGREGAR SERVICIO');?></td>
+	<td colspan="2"><?php echo form_submit('envio', 'AGREGAR SERVICIO');?></td>
 </tr>
 </table>
   <?php
@@ -469,6 +512,13 @@
 ?>
 </div>
 
+<div id="impresiones" align="center">
+<?php
+	if(isset($impresiones) && $this->session->userdata('nivel') == 1){
+	   echo $impresiones;
+	}
+?>
+</div>
 
 </div>
 
@@ -560,6 +610,24 @@
     
 
 //////////////////////////////////////////////////////////*****************************************//////////////
+
+$('input[id^="condicion"]').change(function(){
+        
+        var a = $(this).attr('value');
+        var b = $(this).attr('checked');
+        var id = $('#id').attr('value');
+        
+        var variables = {
+            orden_id : id,
+            condicion_id : a,
+            checada : b
+        };
+        
+        var url = "<?php echo site_url();?>/recepcion/condiciones";
+        
+        $.post( url, variables, function(data) {});
+});
+
 
     $('#clientes_c_form_agrega').submit(function(event) {
         

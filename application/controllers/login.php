@@ -15,13 +15,96 @@ class Login extends CI_Controller
     
     function modificar_tablas()
     {
-        $sql1 = "show fields from clientes where Field = 'obser_cli'";
+        //Aqui empiezan los alter para las tablas que cambias de estructura.
+        $sql1 = "show fields from clientes where Field = 'obser_cli';";
         $query1 = $this->db->query($sql1);
         if($query1->num_rows() == 0){
             $tabla_clientes = "ALTER TABLE `sastreria`.`clientes` ADD COLUMN `obser_cli` VARCHAR(255) DEFAULT NULL AFTER `tipo`;";
             $this->db->query($tabla_clientes);
         }
         
+        $sql2 = "show fields from parametros where Field = 'entregalv';";
+        $query2 = $this->db->query($sql2);
+        if($query2->num_rows() == 0){
+            $tabla_parametros = "ALTER TABLE `sastreria`.`parametros` 
+ADD COLUMN `entregalv` TIME NOT NULL DEFAULT '18:00:00' AFTER `clausulado`,
+ADD COLUMN `entregas` TIME NOT NULL DEFAULT '15:00:00' AFTER `entregalv`,
+ADD COLUMN `entregad` TIME NOT NULL DEFAULT '15:00:00' AFTER `entregas`,
+ADD COLUMN `abredomingo` TINYINT UNSIGNED NOT NULL DEFAULT 0 AFTER `entregad`;";
+            $this->db->query($tabla_parametros);
+        }
+
+        $sql3 = "show fields from parametros where Field = 'entregalv';";
+        $query3 = $this->db->query($sql3);
+        if($query3->num_rows() == 0){
+            $tabla_usuarios = "ALTER TABLE `sastreria`.`usuarios` ADD COLUMN `password2` VARCHAR(20) NOT NULL AFTER `avatar`;";
+            $this->db->query($tabla_usuarios);
+        }
+
+        $sql4 = "show tables from sastreria like 'audita_impresiones';";
+        $query4 = $this->db->query($sql4);
+        if($query4->num_rows() == 0){
+            $tabla = "CREATE TABLE IF NOT EXISTS `audita_impresiones` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `id_orden` int(10) unsigned NOT NULL,
+  `fecha` datetime NOT NULL,
+  `tipo` enum('ticket','talon','tintoreria') default NULL,
+  `id_usuario` int(10) unsigned NOT NULL,
+  PRIMARY KEY  (`id`),
+  KEY `autida_impresiones_id_orden` (`id_orden`),
+  KEY `audita_impresiones_tipo` (`tipo`)
+) DEFAULT CHARSET=utf8;";
+            $this->db->query($tabla);
+        }
+
+        $sql5 = "show tables from sastreria like 'condiciones';";
+        $query5 = $this->db->query($sql5);
+        if($query5->num_rows() == 0){
+            $tabla = "CREATE TABLE IF NOT EXISTS `condiciones` (
+  `id` int(10) unsigned NOT NULL auto_increment,
+  `condicion` varchar(255) NOT NULL,
+  `tipo` tinyint(3) unsigned NOT NULL default '1',
+  PRIMARY KEY  (`id`)
+) DEFAULT CHARSET=utf8;";
+            $this->db->query($tabla);
+        }
+
+        $sql6 = "show tables from sastreria like 'orden_a';";
+        $query6 = $this->db->query($sql6);
+        if($query6->num_rows() == 0){
+            $tabla = "CREATE TABLE IF NOT EXISTS `orden_a` (
+  `orden_id` int(10) unsigned NOT NULL,
+  `condicion_id` int(10) unsigned NOT NULL,
+  PRIMARY KEY  (`orden_id`,`condicion_id`)
+) DEFAULT CHARSET=utf8;";
+            $this->db->query($tabla);
+        }
+
+        $sql7 = "show fields from servicios where Field = 'clasificacion';";
+        $query7 = $this->db->query($sql7);
+        if($query7->num_rows() == 0){
+            $tabla_servicios = "ALTER TABLE `sastreria`.`servicios` ADD COLUMN `clasificacion` SMALLINT UNSIGNED NOT NULL DEFAULT 1 AFTER `tipo`;
+        ALTER TABLE `sastreria`.`servicios` ADD INDEX `idx_clasificacion`(`clasificacion`);";
+            $this->db->query($tabla_servicios);
+        }
+
+        $sql8 = "show tables from sastreria like 'tipo_servicio';";
+        $query8 = $this->db->query($sql8);
+        if($query8->num_rows() == 0){
+            $tabla = "CREATE TABLE  `tipo_servicio` (
+  `tipo_servicio` int(10) unsigned NOT NULL auto_increment,
+  `tipo_servicio_desc` varchar(45) NOT NULL,
+  PRIMARY KEY  (`tipo_servicio`)
+) DEFAULT CHARSET=utf8;";
+            $this->db->query($tabla);
+        }
+        
+        $sql9 = "INSERT IGNORE INTO `tipo_servicio` (`tipo_servicio`,`tipo_servicio_desc`) VALUES 
+ (1,'COSTURA'),
+ (2,'TINTORERIA'),
+ (3,'PLANCHADO');";
+        $this->db->query($sql9);
+
     }
 
     function index($error = null)

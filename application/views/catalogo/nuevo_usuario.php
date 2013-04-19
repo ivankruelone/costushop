@@ -20,6 +20,13 @@
 										</dd>
 
 										<dt>
+											<label>Password para reimpresiones</label>
+										</dt>
+										<dd>
+											<input class="small" type="password" id="password2" name="password2" maxlength="20" required />
+										</dd>
+
+										<dt>
 											<label>Nombre</label>
 										</dt>
 										<dd>
@@ -57,6 +64,7 @@
             event.preventDefault();
             var username = $('#username').attr('value');
             var password = $('#password').attr('value');
+            var password2 = $('#password2').attr('value');
             var nombre = $('#nombre').attr('value');
             var email = $('#emal').attr('value');
             
@@ -65,6 +73,7 @@
                 var variables = {
                     username: username,
                     password: password,
+                    password2: password2,
                     nombre: nombre,
                     email: email
                 };

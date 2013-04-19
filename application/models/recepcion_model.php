@@ -2,6 +2,10 @@
 class Recepcion_model extends CI_Model
 {
     var $dias = null;
+    var $abredomingo = null;
+    var $entregalv = null;
+    var $entregas = null;
+    var $entregad = null;
 
     function __construct()
     {
@@ -11,6 +15,10 @@ class Recepcion_model extends CI_Model
         $q = $this->db->get('parametros');
         $r = $q->row();
         $this->dias = $r->dias;
+        $this->abredomingo = $r->abredomingo;
+        $this->entregalv = $r->entregalv;
+        $this->entregas = $r->entregas;
+        $this->entregad = $r->entregad;
 
     }
 
@@ -23,6 +31,32 @@ class Recepcion_model extends CI_Model
 
         foreach ($query->result() as $row) {
             $a[$row->id] = $row->nombre;
+        }
+
+        return $a;
+    }
+
+    function reimpresion_combo()
+    {
+        $a = array();
+
+        $a[0] = "TODOS";
+        $a['ticket'] = 'TICKET';
+        $a['talon'] = 'TALON';
+        $a['tintoreria'] = 'TINTORERIA';
+
+        return $a;
+    }
+
+    function tipo_servicio_combo()
+    {
+        $a = array();
+
+        $a[0] = "TODOS";
+        $query = $this->db->get('tipo_servicio');
+
+        foreach ($query->result() as $row) {
+            $a[$row->tipo_servicio] = $row->tipo_servicio_desc;
         }
 
         return $a;
@@ -301,6 +335,7 @@ class Recepcion_model extends CI_Model
 
 
         $tabla = "
+        <h2>Detalle de los pagos.</h2>
         <table id=\"hor-minimalist-b\">
         <thead>
 
@@ -341,7 +376,7 @@ class Recepcion_model extends CI_Model
         <td align=\"right\" id=\"abonado\">" . number_format($importe, 2) .
             "</td>
         </tr>
-        </tfoot
+        </tfoot>
         </table>
         ";
 
@@ -735,6 +770,286 @@ order by o.id;";
 
         $tabla .= anchor('recepcion/ventas_excel/' . $this->input->post('fecha_inicial') .
             '/' . $this->input->post('fecha_final') . '/' . $estatus, 'Bajarlo a excel');
+
+
+        return $tabla;
+
+    }
+
+    function reimpresiones()
+    {
+        $fecha1 = $this->input->post('fecha_inicial');
+        $fecha2 = $this->input->post('fecha_final');
+
+        $estatus = $this->input->post('status');
+
+        if ((string)$estatus == '0') {
+            $where = null;
+        } else {
+            $where = " and tipo = '" . $estatus . "' ";
+        }
+
+        $sql = "SELECT o.id, fecha_alta, tipo, count(*) as cuenta FROM orden_c o
+join audita_impresiones a on o.id = a.id_orden $where
+where a.fecha between '$fecha1 00:00:00' and '$fecha2 23:59:59' or fecha_alta between '$fecha1' and '$fecha2'
+group by o.id, tipo
+order by count(*) desc;";
+
+        $query = $this->db->query($sql);
+
+        $tabla = "
+        <span><h1>" . TITULO_WEB . "</h1></span>
+        <h1>Reporte de Venta del <span id=\"fecha1\">" . $this->input->post('fecha_inicial') .
+            "</span> al <span id=\"fecha2\">" . $this->input->post('fecha_final') .
+            "</span></h1>
+        <table id=\"hor-minimalist-b\">
+        <caption>Mostrando " . $query->num_rows() .
+            " Resultados, Tipo: <span id=\"status_reporte\">$estatus</span></caption>
+        <thead>
+
+        <tr>
+        <th align=\"center\">ID Orden</th>
+        <th align=\"left\">Tipo</th>
+        <th align=\"left\">Alta</th>
+        <th align=\"left\">Impresiones</th>
+        <th align=\"left\">Detalle</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        ";
+
+
+        foreach ($query->result() as $row) {
+            $l1 = anchor('recepcion/tabla_recepcion/' . $row->id, 'Abrir');
+            //id, nombre, dire, descu, rfc, correo, telcasa, teltra, telcel, tipo
+            $tabla .= "
+            <tr>
+            <td align=\"center\">" . $row->id . "</td>
+            <td align=\"left\">" . $row->tipo . "</td>
+            <td align=\"left\">" . $row->fecha_alta . "</td>
+            <td align=\"left\">" . $row->cuenta . "</td>
+            <td align=\"left\">" . $this->reimpresion_detalle2($row->id, $row->tipo) . "</td>
+            </tr>
+            ";
+
+
+        }
+
+        $tabla .= "
+        </tbody>
+        </table>
+        ";
+
+        $tabla .= anchor('recepcion/ventas_excel/' . $this->input->post('fecha_inicial') .
+            '/' . $this->input->post('fecha_final') . '/' . $estatus, 'Bajarlo a excel');
+
+
+        return $tabla;
+
+    }
+    
+    function cuota_titulo()
+    {
+        $fecha1 = $this->input->post('fecha_inicial');
+        $fecha2 = $this->input->post('fecha_final');
+        
+        $a = "Cuota de venta del " . $fecha1 . " al " . $fecha2 . ".";
+        return $a;
+    }
+
+    function cuota_arreglo()
+    {
+        $fecha1 = $this->input->post('fecha_inicial');
+        $fecha2 = $this->input->post('fecha_final');
+
+        $sql = "SELECT tipo_servicio, tipo_servicio_desc, sum(d.precio * cantidad * (((100 - descuentox) / 100))) as monto FROM orden_c c
+join orden_d d on c.id = d.c_id
+left join servicios s on d.s_id = s.id
+left join tipo_servicio t on s.clasificacion = t.tipo_servicio
+where c.id_status in(3, 4) and fecha_alta between '$fecha1' and '$fecha2'
+group by tipo_servicio;";
+
+        $query = $this->db->query($sql);
+
+        $a = null;
+        
+        foreach($query->result() as $row)
+        {
+            $a .= "['".$row->tipo_servicio_desc."', ".$row->monto."],";
+        }
+        
+        $a = substr($a, 0, -1);
+        
+        return $a;
+    }
+    
+    function cuota()
+    {
+        $fecha1 = $this->input->post('fecha_inicial');
+        $fecha2 = $this->input->post('fecha_final');
+
+        $sql = "SELECT tipo_servicio, tipo_servicio_desc, sum(d.precio * cantidad * (((100 - descuentox) / 100))) as monto FROM orden_c c
+join orden_d d on c.id = d.c_id
+left join servicios s on d.s_id = s.id
+left join tipo_servicio t on s.clasificacion = t.tipo_servicio
+where c.id_status in(3, 4) and fecha_alta between '$fecha1' and '$fecha2'
+group by tipo_servicio;";
+
+        $query = $this->db->query($sql);
+
+        $tabla = "
+        <span><h1>" . TITULO_WEB . "</h1></span>
+        <h1>Reporte de cuota de venta del <span id=\"fecha1\">" . $this->input->post('fecha_inicial') .
+            "</span> al <span id=\"fecha2\">" . $this->input->post('fecha_final') .
+            "</span></h1>
+        <table id=\"hor-minimalist-b\">
+        <caption>Mostrando " . $query->num_rows() . " Resultados</span></caption>
+        <thead>
+
+        <tr>
+        <th align=\"center\">ID Tipo</th>
+        <th align=\"center\">Tipo</th>
+        <th align=\"right\">Monto</th>
+        <th align=\"center\">Detalle</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        ";
+
+
+        foreach ($query->result() as $row) {
+            //$l1 = anchor('recepcion/tabla_recepcion/' . $row->id, 'Abrir');
+            //id, nombre, dire, descu, rfc, correo, telcasa, teltra, telcel, tipo
+            $tabla .= "
+            <tr>
+            <td align=\"center\">" . $row->tipo_servicio . "</td>
+            <td align=\"center\">" . $row->tipo_servicio_desc . "</td>
+            <td align=\"right\">" . number_format($row->monto, 2) . "</td>
+            <td align=\"left\"></td>
+            </tr>
+            ";
+
+
+        }
+
+        $tabla .= "
+        </tbody>
+        </table>
+        ";
+
+
+        return $tabla;
+
+    }
+
+    function reimpresion_detalle($orden, $tipo)
+    {
+        $this->db->select('a.fecha, nombre');
+        $this->db->from('audita_impresiones a');
+        $this->db->join('usuarios u', 'u.id = a.id_usuario', 'LEFT');
+        $this->db->where('a.id_orden', $orden);
+        $this->db->where('a.tipo', $tipo);
+        
+        $query = $this->db->get();
+        
+        $tabla = "<table>
+        <thead>
+        <tr>
+        <th>Fecha</th>
+        <th>Usuario</th>
+        </tr>
+        </thead>
+        <tbody>";
+        
+        foreach($query->result() as $row)
+        {
+            $tabla .= "<tr>
+            <td>" . $row->fecha . "</td>
+            <td>" . $row->nombre . "</td>
+            </tr>";
+        }
+        
+        $tabla .= "</tbody>
+        </table>";
+        
+        return $tabla;
+    }
+
+    function reimpresion_detalle2($orden, $tipo)
+    {
+        $this->db->select('a.fecha, nombre');
+        $this->db->from('audita_impresiones a');
+        $this->db->join('usuarios u', 'u.id = a.id_usuario', 'LEFT');
+        $this->db->where('a.id_orden', $orden);
+        $this->db->where('a.tipo', $tipo);
+        
+        $query = $this->db->get();
+        
+        $tabla = "<ol>";
+        
+        foreach($query->result() as $row)
+        {
+            $tabla .= "<li>" . $row->fecha . " -
+            " . $row->nombre . "
+            </li>";
+        }
+        
+        $tabla .= "</ol>";
+        
+        return $tabla;
+    }
+
+    function reimpresiones_orden($id)
+    {
+
+        $sql = "SELECT o.id, fecha_alta, tipo, count(*) as cuenta FROM orden_c o
+join audita_impresiones a on o.id = a.id_orden
+where o.id = ?
+group by o.id, tipo
+order by count(*) desc;";
+
+        $query = $this->db->query($sql, $id);
+
+        $tabla = "
+        <h2>Detalle de impresiones</h2>
+        <table id=\"hor-minimalist-b\">
+        <thead>
+
+        <tr>
+        <th align=\"center\">ID Orden</th>
+        <th align=\"left\">Tipo</th>
+        <th align=\"left\">Alta</th>
+        <th align=\"left\">Impresiones</th>
+        <th align=\"left\">Detalle</th>
+
+        </tr>
+        </thead>
+        <tbody>
+        ";
+
+
+        foreach ($query->result() as $row) {
+            $l1 = anchor('recepcion/tabla_recepcion/' . $row->id, 'Abrir');
+            //id, nombre, dire, descu, rfc, correo, telcasa, teltra, telcel, tipo
+            $tabla .= "
+            <tr>
+            <td align=\"center\">" . $row->id . "</td>
+            <td align=\"left\">" . $row->tipo . "</td>
+            <td align=\"left\">" . $row->fecha_alta . "</td>
+            <td align=\"left\">" . $row->cuenta . "</td>
+            <td align=\"left\">" . $this->reimpresion_detalle2($row->id, $row->tipo) . "</td>
+            </tr>
+            ";
+
+
+        }
+
+        $tabla .= "
+        </tbody>
+        </table>
+        ";
 
 
         return $tabla;
@@ -1157,7 +1472,7 @@ left join prendas p2 on a.prenda_nueva = p2.id
             //no_prendas, observacion, id_status, id_user, fecha_captura
             $data = array(
                 'id_cliente' => 0,
-                'hora_entrega' => '18:00:00',
+                'hora_entrega' => $this->hora_entrega($this->fecha_alta()),
                 'importe' => 0,
                 'descu' => 0,
                 'descuentox' => 0,
@@ -1169,14 +1484,14 @@ left join prendas p2 on a.prenda_nueva = p2.id
                 'id_status' => 1,
                 'id_user' => $this->session->userdata('id'));
             $this->db->set('fecha_alta', 'date(now())', false);
-            $this->db->set('fecha_entrega', 'date_add(date(now()), interval ' . $this->dias .
-                ' day)', false);
+            $this->db->set('fecha_entrega', "'".$this->fecha_alta()."'", false);
             $this->db->set('fecha_captura', 'now()', false);
             $this->db->where('id', $r->id);
             $this->db->update('orden_c', $data);
 
             $this->db->delete('orden_d', array('c_id' => $r->id));
             $this->db->delete('orden_p', array('c_id' => $r->id));
+            $this->db->delete('orden_a', array('orden_id' => $r->id));
 
             return $r->id;
 
@@ -1184,21 +1499,94 @@ left join prendas p2 on a.prenda_nueva = p2.id
 
             $new_member_insert_data = array(
                 'id_cliente' => 0,
-                'hora_entrega' => '18:00:00',
+                'hora_entrega' => $this->hora_entrega($this->fecha_alta()),
                 'observacion' => '',
                 'id_status' => 1,
                 'id_user' => $this->session->userdata('id'));
 
             $this->db->set('fecha_alta', 'date(now())', false);
-            $this->db->set('fecha_entrega', 'date_add(date(now()), interval ' . $this->dias .
-                ' day)', false);
+            $this->db->set('fecha_entrega', "'".$this->fecha_alta()."'", false);
             $this->db->set('fecha_captura', 'now()', false);
 
             $this->db->insert('orden_c', $new_member_insert_data);
-
             return $this->db->insert_id();
 
         }
+        
+    }
+    
+    function fecha_alta()
+    {
+        if($this->abredomingo == 0){
+            for ($i = $this->dias; ; $i++) {
+                
+                $sql = "select date_add(date(now()), interval $i day) as fecha, dayofweek(date_add(date(now()), interval $i day)) as dia;";
+                $q = $this->db->query($sql);
+                $r = $q->row();
+                
+                if ((int)$r->dia != (int)1) {
+                    
+                    break;
+                }
+                
+            }
+            return $r->fecha;
+        }else{
+                $sql = "select date_add(date(now()), interval $this->dias day) as fecha;";
+                $q = $this->db->query($sql);
+                $r = $q->row();
+                
+                return $r->fecha;
+            
+        }
+        
+        
+    }
+    
+    function fecha_alta_guarda($fecha = '2013-04-28')
+    {
+        if($this->abredomingo == 0){
+            
+            for ($i = 0; ; $i++) {
+                
+                $sql = "select date_add(?, interval $i day) as fecha, dayofweek(date_add(date(now()), interval $i day)) as dia;";
+                $q = $this->db->query($sql, $fecha);
+                $r = $q->row();
+                
+                
+                
+                if ((int)$r->dia != (int)6) {
+                    
+                    break;
+                }
+                
+            }
+            return $r->fecha;
+        }else{
+                
+                return $fecha;
+            
+        }
+        
+        
+    }
+
+    function hora_entrega($fecha)
+    {
+        $sql = "select dayofweek('$fecha') as dia;";
+        $q = $this->db->query($sql);
+        $r = $q->row();
+        
+        if((int)$r->dia == (int)1){
+            $hora = $this->entregad;
+        }elseif((int)$r->dia == (int)7){
+            $hora = $this->entregas;
+        }else{
+            $hora = $this->entregalv;
+        }
+        
+        return $hora;
+        
     }
 
     function trae_datos_parametro()
@@ -1443,7 +1831,7 @@ left join prendas p2 on a.prenda_nueva = p2.id
         $query = $this->db->query($sql, array($id));
         return $query;
     }
-
+    
     function busca_prenda()
     {
         $sql = "SELECT id,nombre FROM  prendas where tipo = 1";
@@ -1705,7 +2093,7 @@ left join prendas p2 on a.prenda_nueva = p2.id
             'nombre' => strtoupper(trim($nom)),
             'prenda' => $pre,
             'precio' => $precio,
-            'fecha' => date('Y-m-d H:m'),
+            'fecha' => date('Y-m-d H:i'),
             'tipo' => 0);
 
         $insert = $this->db->insert('servicios', $new_member_insert_data);
@@ -1726,7 +2114,7 @@ left join prendas p2 on a.prenda_nueva = p2.id
             'nombre' => strtoupper(trim($nom)),
             'prenda' => $pre,
             'precio' => $precio,
-            'fecha' => date('Y-m-d H:m'),
+            'fecha' => date('Y-m-d H:i'),
             'tipo' => $tipo);
 
         $this->db->where('id', $id);
@@ -1872,6 +2260,76 @@ left join prendas p2 on a.prenda_nueva = p2.id
     {
         $this->db->set('pendiente', '(total - abono)', false);
         $this->db->update('orden_c', null, array('id' => $id));
+    }
+    
+    function verifica_impresion($id, $tipo)
+    {
+        $this->db->where('id_orden', $id);
+        $this->db->where('tipo', $tipo);
+        $query = $this->db->get('audita_impresiones');
+        
+        if($query->num_rows() == 0)
+        {
+            return FALSE;
+        }else{
+            return TRUE;
+        }
+        
+    }
+    
+    function verifica_password($username, $password)
+    {
+        $this->db->where('username', $username);
+        $this->db->where('password2', $password);
+        
+        $query = $this->db->get('usuarios');
+        
+        if($query->num_rows() == 0)
+        {
+            return FALSE;
+        }else{
+            return TRUE;
+        }
+        
+    }
+    
+    function inserta_condicion($orden_id, $condicion_id)
+    {
+        $data = array(
+           'orden_id' => $orden_id,
+           'condicion_id' => $condicion_id
+        );
+
+        $this->db->insert('orden_a', $data);
+    }
+    
+    function borra_condicion($orden_id, $condicion_id)
+    {
+        $this->db->delete('orden_a', array('orden_id' => $orden_id, 'condicion_id' => $condicion_id));
+    }
+    
+    function condiciones_orden($id)
+    {
+        $sql = "SELECT condicion FROM orden_a o
+left join condiciones c on o.condicion_id = c.id
+where orden_id = ?;";
+        $query = $this->db->query($sql, $id);
+        return $query;
+    }
+
+    function actualizacion()
+    {
+        $sql = "ALTER TABLE `sastreria`.`parametros` 
+ADD COLUMN `entregalv` TIME NOT NULL DEFAULT '18:00:00' AFTER `clausulado`,
+ADD COLUMN `entregas` TIME NOT NULL DEFAULT '15:00:00' AFTER `entregalv`,
+ADD COLUMN `entregad` TIME NOT NULL DEFAULT '15:00:00' AFTER `entregas`,
+ADD COLUMN `abredomingo` TINYINT UNSIGNED NOT NULL DEFAULT 0 AFTER `entregad`;";
+        
+        $sql2 = "ALTER TABLE `sastreria`.`usuarios` ADD COLUMN `password2` VARCHAR(20) NOT NULL AFTER `avatar`;";
+        
+        $sql3 = "ALTER TABLE `sastreria`.`servicios` ADD COLUMN `clasificacion` SMALLINT UNSIGNED NOT NULL DEFAULT 1 AFTER `tipo`;
+        ALTER TABLE `sastreria`.`servicios` ADD INDEX `idx_clasificacion`(`clasificacion`);";
+
     }
 
 }
