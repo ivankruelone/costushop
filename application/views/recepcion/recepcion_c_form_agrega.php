@@ -180,6 +180,10 @@
 	}
 ?>
 <tr>
+    <td colspan="4">ATENDIO: <?php echo $orden->atendio; ?></td>
+</tr>
+
+<tr>
     <td colspan="4"><?php echo form_textarea($data_obser);?></td>
 </tr>
 

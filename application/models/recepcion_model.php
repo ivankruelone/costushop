@@ -1605,10 +1605,11 @@ left join prendas p2 on a.prenda_nueva = p2.id
 
     function get_orden($id)
     {
-        $this->db->select('o.*, c.nombre, e.nombre as estatusx, telcasa, telcel, dayofweek(o.fecha_entrega) as dia, dayofweek(o.fecha_alta) as dia_alta');
+        $this->db->select('o.*, c.nombre, e.nombre as estatusx, telcasa, telcel, dayofweek(o.fecha_entrega) as dia, dayofweek(o.fecha_alta) as dia_alta, u.nombre as atendio');
         $this->db->from('orden_c o');
         $this->db->join('clientes c', 'o.id_cliente = c.id', 'LEFT');
         $this->db->join('estatus e', 'o.id_status = e.id', 'LEFT');
+        $this->db->join('usuarios u', 'o.id_user = u.id', 'LEFT');
         $this->db->where('o.id', $id);
         $query = $this->db->get();
 

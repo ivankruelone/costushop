@@ -77,6 +77,11 @@
             <?php echo $row->no_prendas; ?>
         </td>
     </tr>
+    <tr>
+        <td>Atendi&oacute;: </td>
+        <td colspan="3"><?php echo $row->atendio; ?></td>
+    </tr>
+
 </table>
     </div>
     <div>
@@ -164,7 +169,7 @@
 	<div align="center" style="font-size: 35px; clear: both;">
                 <?php echo $dia[$row->dia]; ?>
     </div>
-	<p>---</p>
+	<p style="text-align: right;">Fecha de impresi&oacute;n: <?php echo date('d/m/Y H:i:s'); ?></p>
 </div>
 </div>
 </body>
